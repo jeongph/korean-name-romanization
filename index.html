@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>한국어 이름 로마자 변환기</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f9fafb;
+      --card: #ffffff;
+      --accent: #2563eb;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      font-size: 1rem;
+    }
+
+    button {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 0.75rem;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: #1e40af; }
+
+    .result {
+      margin-top: 1.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    .note {
+      margin-top: 2rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>한국어 이름 로마자 변환기</h1>
+
+    <label for="koreanName">한글 이름 입력</label>
+    <input type="text" id="koreanName" placeholder="예: 박정욱">
+    <button id="convertBtn">로마자로 변환</button>
+
+    <div class="result" id="romanizedName"></div>
+
+    <p class="note">※ 변환은 2000년 개정 국어의 로마자 표기법 기준이며, 실제 여권·관행 표기는 다를 수 있습니다.</p>
+  </div>
+
+  <script>
+    /* Revised Romanization tables */
+    const L_TABLE = ["g","kk","n","d","tt","r","m","b","pp","s","ss","","j","jj","ch","k","t","p","h"];
+    const V_TABLE = ["a","ae","ya","yae","eo","e","yeo","ye","o","wa","wae","oe","yo","u","wo","we","wi","yu","eu","ui","i"];
+    const T_TABLE = ["", "k", "k", "ks", "n", "nj", "nh", "t", "l", "lk", "lm", "lp", "ls", "lt", "lp", "lh", "m", "p", "ps", "t", "t", "ng", "t", "t", "k", "t", "p", "h"];
+
+    const S_BASE = 0xAC00;
+    const L_COUNT = 19;
+    const V_COUNT = 21;
+    const T_COUNT = 28;
+    const N_COUNT = V_COUNT * T_COUNT; // 588
+
+    function romanizeHangul(text) {
+      const result = [];
+      for (const ch of text) {
+        const code = ch.charCodeAt(0);
+        if (code < 0xAC00 || code > 0xD7A3) {
+          result.push(ch);
+          continue;
+        }
+        const sIndex = code - S_BASE;
+        const lIndex = Math.floor(sIndex / N_COUNT);
+        const vIndex = Math.floor((sIndex % N_COUNT) / T_COUNT);
+        const tIndex = sIndex % T_COUNT;
+        result.push(capitalizeFirst(L_TABLE[lIndex] + V_TABLE[vIndex] + T_TABLE[tIndex]));
+      }
+      return result.join("");
+    }
+
+    function capitalizeFirst(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function convertName() {
+      const input = document.getElementById("koreanName").value.trim();
+      if (!input) {
+        document.getElementById("romanizedName").textContent = "이름을 입력해 주세요.";
+        return;
+      }
+      // 공백 기준으로 성과 이름 구분
+      const parts = input.split(/\s+/);
+      const surname = parts[0];
+      const given = parts.slice(1).join("");
+      const romanSurname = capitalizeFirst(romanizeHangul(surname));
+      const romanGiven = romanizeHangul(given);
+      const full = `${romanSurname} ${romanGiven}`;
+      document.getElementById("romanizedName").textContent = full;
+    }
+
+    document.getElementById("convertBtn").addEventListener("click", convertName);
+    document.getElementById("koreanName").addEventListener("keypress", e => {
+      if (e.key === "Enter") convertName();
+    });
+  </script>
+</body>
+</html>
