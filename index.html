@@ -15,6 +15,15 @@
       --border: #e5e7eb;
     }
 
+    .dark {
+      --bg: #1f2937;
+      --card: #374151;
+      --accent: #3b82f6;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --border: #4b5563;
+    }
+
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -26,6 +35,7 @@
       justify-content: center;
       min-height: 100vh;
       padding: 1rem;
+      transition: background 0.3s, color 0.3s;
     }
 
     .card {
@@ -35,7 +45,8 @@
       padding: 2rem;
       width: 100%;
       max-width: 520px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      position: relative;
     }
 
     h1 {
@@ -56,6 +67,8 @@
       border: 1px solid var(--border);
       border-radius: 0.75rem;
       font-size: 1rem;
+      background: var(--bg);
+      color: var(--text-primary);
     }
 
     button {
@@ -72,6 +85,18 @@
     }
 
     button:hover { background: #1e40af; }
+
+    .toggle-darkmode {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-decoration: underline;
+    }
 
     .result {
       margin-top: 1.5rem;
@@ -91,6 +116,7 @@
 </head>
 <body>
   <div class="card">
+    <button class="toggle-darkmode" onclick="toggleDarkMode()">다크모드 전환</button>
     <h1>한국어 이름 로마자 변환기</h1>
 
     <label for="koreanName">한글 이름 입력</label>
@@ -141,7 +167,6 @@
         document.getElementById("romanizedName").textContent = "이름을 입력해 주세요.";
         return;
       }
-      // 공백 기준으로 성과 이름 구분
       const parts = input.split(/\s+/);
       const surname = parts[0];
       const given = parts.slice(1).join("");
@@ -149,6 +174,10 @@
       const romanGiven = romanizeHangul(given);
       const full = `${romanSurname} ${romanGiven}`;
       document.getElementById("romanizedName").textContent = full;
+    }
+
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle("dark");
     }
 
     document.getElementById("convertBtn").addEventListener("click", convertName);
