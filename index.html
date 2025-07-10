@@ -38,6 +38,19 @@
       transition: background 0.3s, color 0.3s;
     }
 
+    .toggle-darkmode {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-decoration: underline;
+      z-index: 10;
+    }
+
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -45,7 +58,7 @@
       padding: 2rem;
       width: 100%;
       max-width: 520px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
       position: relative;
     }
 
@@ -86,18 +99,6 @@
 
     button:hover { background: #1e40af; }
 
-    .toggle-darkmode {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-size: 0.9rem;
-      text-decoration: underline;
-    }
-
     .result {
       margin-top: 1.5rem;
       font-size: 1.25rem;
@@ -115,8 +116,8 @@
   </style>
 </head>
 <body>
+  <button class="toggle-darkmode" onclick="toggleDarkMode()">다크모드 전환</button>
   <div class="card">
-    <button class="toggle-darkmode" onclick="toggleDarkMode()">다크모드 전환</button>
     <h1>한국어 이름 로마자 변환기</h1>
 
     <label for="koreanName">한글 이름 입력</label>
