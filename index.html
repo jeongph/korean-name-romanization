@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>한국어 이름 로마자 변환기</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
+      --bg: #1e1e2f;
+      --card: #2c2f3e;
+      --accent: #4f46e5;
+      --text-primary: #ffffff;
+      --text-secondary: #cbd5e1;
+      --border: #3b3f51;
+    }
+
+    .light {
       --bg: #f9fafb;
       --card: #ffffff;
       --accent: #2563eb;
@@ -15,68 +24,78 @@
       --border: #e5e7eb;
     }
 
-    .dark {
-      --bg: #1f2937;
-      --card: #374151;
-      --accent: #3b82f6;
-      --text-primary: #f9fafb;
-      --text-secondary: #9ca3af;
-      --border: #4b5563;
-    }
-
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Noto Sans KR", sans-serif;
+      font-family: 'Noto Sans KR', sans-serif;
       background: var(--bg);
       color: var(--text-primary);
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 1rem;
+      padding: 2rem;
       transition: background 0.3s, color 0.3s;
     }
 
-    .toggle-darkmode {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-size: 0.9rem;
-      text-decoration: underline;
-      z-index: 10;
-    }
-
     .card {
+      position: relative;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 1rem;
       padding: 2rem;
       width: 100%;
-      max-width: 520px;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
-      position: relative;
+      max-width: 500px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .toggle-darkmode {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 50px;
+      height: 26px;
+      border: none;
+      background-color: var(--accent);
+      border-radius: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 3px;
+      transition: background 0.3s;
+    }
+
+    .toggle-darkmode .icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: transform 0.3s;
+    }
+
+    .light .toggle-darkmode {
+      justify-content: flex-end;
     }
 
     h1 {
-      margin: 0 0 1rem;
+      margin-bottom: 1rem;
       font-size: 1.5rem;
       text-align: center;
     }
 
     label {
-      display: block;
-      margin-bottom: 0.5rem;
       font-weight: 500;
     }
 
-    input[type="text"] {
+    input {
       width: 100%;
       padding: 0.75rem 1rem;
+      margin-top: 0.5rem;
       border: 1px solid var(--border);
       border-radius: 0.75rem;
       font-size: 1rem;
@@ -84,78 +103,82 @@
       color: var(--text-primary);
     }
 
-    button {
-      margin-top: 1rem;
+    button.convert {
       width: 100%;
-      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+      padding: 0.75rem;
       font-size: 1rem;
       border: none;
       border-radius: 0.75rem;
-      color: #fff;
       background: var(--accent);
+      color: white;
       cursor: pointer;
-      transition: background 0.2s;
     }
-
-    button:hover { background: #1e40af; }
 
     .result {
       margin-top: 1.5rem;
       font-size: 1.25rem;
-      font-weight: 700;
       text-align: center;
-      word-wrap: break-word;
+      font-weight: bold;
     }
 
     .note {
-      margin-top: 2rem;
-      font-size: 0.875rem;
-      color: var(--text-secondary);
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
       text-align: center;
+      color: var(--text-secondary);
     }
   </style>
 </head>
 <body>
-  <button class="toggle-darkmode" onclick="toggleDarkMode()">다크모드 전환</button>
   <div class="card">
+    <button class="toggle-darkmode" onclick="toggleDarkMode()">
+      <div class="icon" id="themeIcon">🌙</div>
+    </button>
     <h1>한국어 이름 로마자 변환기</h1>
-
     <label for="koreanName">한글 이름 입력</label>
-    <input type="text" id="koreanName" placeholder="예: 박정욱">
-    <button id="convertBtn">로마자로 변환</button>
-
+    <input type="text" id="koreanName" placeholder="예: 이선행" />
+    <button class="convert" onclick="convertName()">로마자로 변환</button>
     <div class="result" id="romanizedName"></div>
-
-    <p class="note">※ 변환은 2000년 개정 국어의 로마자 표기법 기준이며, 실제 여권·관행 표기는 다를 수 있습니다.</p>
+    <div class="note">※ 성씨는 관행 표기 (예: 이 → Lee, 김 → Kim)를 우선하며, 나머지는 2000년 로마자 표기법을 따릅니다.</div>
   </div>
 
   <script>
-    /* Revised Romanization tables */
-    const L_TABLE = ["g","kk","n","d","tt","r","m","b","pp","s","ss","","j","jj","ch","k","t","p","h"];
-    const V_TABLE = ["a","ae","ya","yae","eo","e","yeo","ye","o","wa","wae","oe","yo","u","wo","we","wi","yu","eu","ui","i"];
-    const T_TABLE = ["", "k", "k", "ks", "n", "nj", "nh", "t", "l", "lk", "lm", "lp", "ls", "lt", "lp", "lh", "m", "p", "ps", "t", "t", "ng", "t", "t", "k", "t", "p", "h"];
+    // 초기 다크모드
+    document.documentElement.classList.remove('light');
+    document.getElementById('themeIcon').textContent = '🌙';
 
-    const S_BASE = 0xAC00;
+    const L_TABLE = ["g", "kk", "n", "d", "tt", "r", "m", "b", "pp", "s", "ss", "", "j", "jj", "ch", "k", "t", "p", "h"];
+    const V_TABLE = ["a", "ae", "ya", "yae", "eo", "e", "yeo", "ye", "o", "wa", "wae", "oe", "yo", "u", "wo", "we", "wi", "yu", "eu", "ui", "i"];
+    const T_TABLE = ["", "k", "k", "ks", "n", "nj", "nh", "t", "l", "lk", "lm", "lp", "ls", "lt", "lp", "lh", "m", "p", "ps", "t", "t", "ng", "t", "t", "k", "t", "p", "h"];
+    const S_BASE = 0xac00;
     const L_COUNT = 19;
     const V_COUNT = 21;
     const T_COUNT = 28;
-    const N_COUNT = V_COUNT * T_COUNT; // 588
+    const N_COUNT = V_COUNT * T_COUNT;
+
+    const surnameMap = {
+      "이": "Lee",
+      "김": "Kim",
+      "박": "Park",
+      "최": "Choi",
+      "정": "Jung",
+      "강": "Kang",
+      "조": "Cho"
+    };
+
+    function decomposeHangul(char) {
+      const code = char.charCodeAt(0);
+      if (code < 0xac00 || code > 0xd7a3) return char;
+      const sIndex = code - S_BASE;
+      const l = Math.floor(sIndex / N_COUNT);
+      const v = Math.floor((sIndex % N_COUNT) / T_COUNT);
+      const t = sIndex % T_COUNT;
+      return L_TABLE[l] + V_TABLE[v] + T_TABLE[t];
+    }
 
     function romanizeHangul(text) {
-      const result = [];
-      for (const ch of text) {
-        const code = ch.charCodeAt(0);
-        if (code < 0xAC00 || code > 0xD7A3) {
-          result.push(ch);
-          continue;
-        }
-        const sIndex = code - S_BASE;
-        const lIndex = Math.floor(sIndex / N_COUNT);
-        const vIndex = Math.floor((sIndex % N_COUNT) / T_COUNT);
-        const tIndex = sIndex % T_COUNT;
-        result.push(capitalizeFirst(L_TABLE[lIndex] + V_TABLE[vIndex] + T_TABLE[tIndex]));
-      }
-      return result.join("");
+      return [...text].map(decomposeHangul).map(capitalizeFirst).join("");
     }
 
     function capitalizeFirst(str) {
@@ -164,27 +187,19 @@
 
     function convertName() {
       const input = document.getElementById("koreanName").value.trim();
-      if (!input) {
-        document.getElementById("romanizedName").textContent = "이름을 입력해 주세요.";
-        return;
-      }
+      if (!input) return;
       const parts = input.split(/\s+/);
       const surname = parts[0];
       const given = parts.slice(1).join("");
-      const romanSurname = capitalizeFirst(romanizeHangul(surname));
+      const romanSurname = surnameMap[surname] || capitalizeFirst(romanizeHangul(surname));
       const romanGiven = romanizeHangul(given);
-      const full = `${romanSurname} ${romanGiven}`;
-      document.getElementById("romanizedName").textContent = full;
+      document.getElementById("romanizedName").textContent = `${romanSurname} ${romanGiven}`;
     }
 
     function toggleDarkMode() {
-      document.documentElement.classList.toggle("dark");
+      const isLight = document.documentElement.classList.toggle("light");
+      document.getElementById("themeIcon").textContent = isLight ? '☀️' : '🌙';
     }
-
-    document.getElementById("convertBtn").addEventListener("click", convertName);
-    document.getElementById("koreanName").addEventListener("keypress", e => {
-      if (e.key === "Enter") convertName();
-    });
   </script>
 </body>
 </html>
