@@ -78,19 +78,10 @@
       transition: transform 0.3s;
     }
 
-    .light .toggle-darkmode {
-      justify-content: flex-end;
-    }
+    .light .toggle-darkmode { justify-content: flex-end; }
 
-    h1 {
-      margin-bottom: 1rem;
-      font-size: 1.5rem;
-      text-align: center;
-    }
-
-    label {
-      font-weight: 500;
-    }
+    h1 { margin-bottom: 1rem; font-size: 1.5rem; text-align: center; }
+    label { font-weight: 500; }
 
     input {
       width: 100%;
@@ -111,7 +102,7 @@
       border: none;
       border-radius: 0.75rem;
       background: var(--accent);
-      color: white;
+      color: #fff;
       cursor: pointer;
     }
 
@@ -132,15 +123,13 @@
 </head>
 <body>
   <div class="card">
-    <button class="toggle-darkmode" onclick="toggleDarkMode()">
-      <div class="icon" id="themeIcon">🌙</div>
-    </button>
+    <button class="toggle-darkmode" onclick="toggleDarkMode()"><div class="icon" id="themeIcon">🌙</div></button>
     <h1>한국어 이름 로마자 변환기</h1>
     <label for="koreanName">한글 이름 입력</label>
-    <input type="text" id="koreanName" placeholder="예: 이선행" />
+    <input type="text" id="koreanName" placeholder="예시: 홍길동" />
     <button class="convert" onclick="convertName()">로마자로 변환</button>
     <div class="result" id="romanizedName"></div>
-    <div class="note">※ 성씨는 관행 표기 (예: 이 → Lee, 김 → Kim)를 우선하며, 나머지는 2000년 로마자 표기법을 따릅니다.</div>
+    <div class="note">※ 성씨는 관행 표기(예: 이 → Lee, 김 → Kim)를 우선하며, 나머지는 2000년 로마자 표기법을 따릅니다.</div>
   </div>
 
   <script>
@@ -148,28 +137,20 @@
     document.documentElement.classList.remove('light');
     document.getElementById('themeIcon').textContent = '🌙';
 
-    const L_TABLE = ["g", "kk", "n", "d", "tt", "r", "m", "b", "pp", "s", "ss", "", "j", "jj", "ch", "k", "t", "p", "h"];
-    const V_TABLE = ["a", "ae", "ya", "yae", "eo", "e", "yeo", "ye", "o", "wa", "wae", "oe", "yo", "u", "wo", "we", "wi", "yu", "eu", "ui", "i"];
-    const T_TABLE = ["", "k", "k", "ks", "n", "nj", "nh", "t", "l", "lk", "lm", "lp", "ls", "lt", "lp", "lh", "m", "p", "ps", "t", "t", "ng", "t", "t", "k", "t", "p", "h"];
+    const L_TABLE = ["g","kk","n","d","tt","r","m","b","pp","s","ss","","j","jj","ch","k","t","p","h"];
+    const V_TABLE = ["a","ae","ya","yae","eo","e","yeo","ye","o","wa","wae","oe","yo","u","wo","we","wi","yu","eu","ui","i"];
+    const T_TABLE = ["","k","k","ks","n","nj","nh","t","l","lk","lm","lp","ls","lt","lp","lh","m","p","ps","t","t","ng","t","t","k","t","p","h"];
+
     const S_BASE = 0xac00;
-    const L_COUNT = 19;
     const V_COUNT = 21;
     const T_COUNT = 28;
     const N_COUNT = V_COUNT * T_COUNT;
 
-    const surnameMap = {
-      "이": "Lee",
-      "김": "Kim",
-      "박": "Park",
-      "최": "Choi",
-      "정": "Jung",
-      "강": "Kang",
-      "조": "Cho"
-    };
+    const surnameMap = { "이":"Lee","김":"Kim","박":"Park","최":"Choi","정":"Jung","강":"Kang","조":"Cho" };
 
-    function decomposeHangul(char) {
-      const code = char.charCodeAt(0);
-      if (code < 0xac00 || code > 0xd7a3) return char;
+    function decomposeHangul(ch){
+      const code = ch.charCodeAt(0);
+      if(code < 0xac00 || code > 0xd7a3) return ch;
       const sIndex = code - S_BASE;
       const l = Math.floor(sIndex / N_COUNT);
       const v = Math.floor((sIndex % N_COUNT) / T_COUNT);
@@ -177,28 +158,29 @@
       return L_TABLE[l] + V_TABLE[v] + T_TABLE[t];
     }
 
-    function romanizeHangul(text) {
-      return [...text].map(decomposeHangul).map(capitalizeFirst).join("");
+    function romanizeHangul(txt){
+      return [...txt].map(decomposeHangul).map(capitalize).join("");
     }
 
-    function capitalizeFirst(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    }
+    function capitalize(str){ return str.charAt(0).toUpperCase()+str.slice(1);} 
 
-    function convertName() {
-      const input = document.getElementById("koreanName").value.trim();
-      if (!input) return;
-      const parts = input.split(/\s+/);
-      const surname = parts[0];
-      const given = parts.slice(1).join("");
-      const romanSurname = surnameMap[surname] || capitalizeFirst(romanizeHangul(surname));
+    function convertName(){
+      const raw = document.getElementById('koreanName').value.trim();
+      if(!raw){ document.getElementById('romanizedName').textContent=''; return; }
+
+      let surname="", given="";
+      const parts = raw.split(/\s+/);
+      if(parts.length>=2){ surname = parts[0]; given = parts.slice(1).join(""); }
+      else { surname = raw.slice(0,1); given = raw.slice(1); }
+
+      const romanSurname = surnameMap[surname] || capitalize(romanizeHangul(surname));
       const romanGiven = romanizeHangul(given);
-      document.getElementById("romanizedName").textContent = `${romanSurname} ${romanGiven}`;
+      document.getElementById('romanizedName').textContent = `${romanSurname} ${romanGiven}`.trim();
     }
 
-    function toggleDarkMode() {
-      const isLight = document.documentElement.classList.toggle("light");
-      document.getElementById("themeIcon").textContent = isLight ? '☀️' : '🌙';
+    function toggleDarkMode(){
+      const isLight = document.documentElement.classList.toggle('light');
+      document.getElementById('themeIcon').textContent = isLight ? '☀️':'🌙';
     }
   </script>
 </body>
