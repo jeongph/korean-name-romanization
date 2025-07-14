@@ -113,11 +113,23 @@
       font-weight: bold;
     }
 
-    .note {
-      margin-top: 1.5rem;
-      font-size: 0.85rem;
-      text-align: center;
-      color: var(--text-secondary);
+    .copy-btn {
+      margin-top: 0.75rem;
+      width: 100%;
+      padding: 0.6rem;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 0.75rem;
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background-color: var(--accent);
+      color: white;
     }
   </style>
 </head>
@@ -129,11 +141,10 @@
     <input type="text" id="koreanName" placeholder="예시: 홍길동" />
     <button class="convert" onclick="convertName()">로마자로 변환</button>
     <div class="result" id="romanizedName"></div>
-    
+    <button class="copy-btn" onclick="copyResult()">복사</button>
   </div>
 
   <script>
-    // 초기 다크모드
     document.documentElement.classList.remove('light');
     document.getElementById('themeIcon').textContent = '🌙';
 
@@ -181,6 +192,27 @@
     function toggleDarkMode(){
       const isLight = document.documentElement.classList.toggle('light');
       document.getElementById('themeIcon').textContent = isLight ? '☀️':'🌙';
+    }
+
+    function copyResult() {
+      const resultText = document.getElementById('romanizedName').textContent;
+      if (!resultText) return;
+      const textarea = document.createElement('textarea');
+      textarea.value = resultText;
+      textarea.style.position = 'fixed';
+      textarea.style.top = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = '복사됨!';
+        setTimeout(() => btn.textContent = '복사', 1500);
+      } catch (err) {
+        alert('복사에 실패했습니다: ' + err);
+      }
+      document.body.removeChild(textarea);
     }
   </script>
 </body>
